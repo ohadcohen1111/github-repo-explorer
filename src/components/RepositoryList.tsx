@@ -28,7 +28,6 @@ interface RepositoryListProps {
   hasMore: boolean;
   toggleSortByStars: () => void;
   loadMoreRepositories: () => void;
-  refreshRepositories: () => void;
 }
 
 const RepositoryList: React.FC<RepositoryListProps> = ({

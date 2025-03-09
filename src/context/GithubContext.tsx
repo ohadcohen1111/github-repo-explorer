@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, ReactNode, useRef } from 'r
 import { Repository } from '../types/github';
 import { 
   fetchUserRepositories,
-  clearUserCache
 } from '../services/githubApi';
 
 interface GithubContextType {
@@ -16,8 +15,6 @@ interface GithubContextType {
   searchRepositories: (username: string) => Promise<void>;
   loadMoreRepositories: () => Promise<void>;
   toggleSortByStars: () => void;
-  clearError: () => void;
-  refreshRepositories: () => Promise<void>;
 }
 
 const GithubContext = createContext<GithubContextType | undefined>(undefined);
@@ -98,42 +95,9 @@ export const GithubProvider: React.FC<GithubProviderProps> = ({ children }) => {
     }
   };
 
-  // Refresh repositories (clear cache and fetch again)
-  const refreshRepositories = async () => {
-    if (!username) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Clear cache for this user
-      clearUserCache(username);
-      
-      // Reset pagination
-      currentPageRef.current = 1;
-      setHasMore(true);
-      
-      // Fetch first page again
-      const data = await fetchUserRepositories(username, 1);
-      setRepositories(data);
-      
-      // If first page is empty, there are no more pages
-      setHasMore(data.length > 0);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Toggle sort by stars
   const toggleSortByStars = () => {
     setSortByStars(prev => !prev);
-  };
-
-  // Clear error
-  const clearError = () => {
-    setError(null);
   };
 
   // Get sorted repositories based on sortByStars flag
@@ -152,8 +116,6 @@ export const GithubProvider: React.FC<GithubProviderProps> = ({ children }) => {
     searchRepositories,
     loadMoreRepositories,
     toggleSortByStars,
-    clearError,
-    refreshRepositories,
   };
 
   return <GithubContext.Provider value={value}>{children}</GithubContext.Provider>;

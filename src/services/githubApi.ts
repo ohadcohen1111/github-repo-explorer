@@ -45,21 +45,6 @@ const cacheUtils = {
   removeCache: (key: string): void => {
     localStorage.removeItem(key);
   },
-
-  // Clear all cache
-  clearCache: (): void => {
-    // Only clear GitHub API related items
-    const keysToRemove: string[] = [];
-    
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.startsWith('repos-') || key.startsWith('repo-details-') || key.startsWith('contributors-'))) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-  }
 };
 
 /**
@@ -73,15 +58,6 @@ const handleApiError = (error: unknown): never => {
     }
   }
   throw error instanceof Error ? error : new Error('An unknown error occurred');
-};
-
-/**
- * Check if we have reached the end of available repositories
- */
-export const isLastPage = (username: string): boolean => {
-  const key = `repos-${username}-meta`;
-  const meta = cacheUtils.getCache<{ hasMore: boolean }>(key);
-  return meta ? !meta.hasMore : false;
 };
 
 /**
@@ -99,7 +75,6 @@ export const fetchUserRepositories = async (
   
   // Check cache first
   if (cacheUtils.hasCache(cacheKey)) {
-    console.log(`Using cached repositories data from localStorage for page ${page}`);
     const cachedData = cacheUtils.getCache<Repository[]>(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -121,29 +96,6 @@ export const fetchUserRepositories = async (
   } catch (error) {
     return handleApiError(error);
   }
-};
-
-/**
- * Fetch all pages of a user's repositories (for special cases)
- * Warning: This can result in many API calls for users with many repos
- */
-export const fetchAllUserRepositories = async (username: string): Promise<Repository[]> => {
-  let allRepos: Repository[] = [];
-  let page = 1;
-  let hasMore = true;
-  
-  while (hasMore) {
-    const repos = await fetchUserRepositories(username, page);
-    if (repos.length === 0) {
-      hasMore = false;
-    } else {
-      allRepos = [...allRepos, ...repos];
-      page++;
-      hasMore = repos.length === PER_PAGE;
-    }
-  }
-  
-  return allRepos;
 };
 
 /**
@@ -205,25 +157,5 @@ export const fetchRepositoryContributors = async (username: string, repo: string
     return response.data;
   } catch (error) {
     return handleApiError(error);
-  }
-};
-
-/**
- * Clear all cache
- */
-export const clearCache = (): void => {
-  cacheUtils.clearCache();
-};
-
-/**
- * Clear cache for a specific username
- */
-export const clearUserCache = (username: string): void => {
-  // Clear all pages of repos
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith(`repos-${username}`)) {
-      localStorage.removeItem(key);
-    }
   }
 };

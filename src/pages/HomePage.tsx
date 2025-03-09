@@ -17,7 +17,6 @@ const HomePage: React.FC = () => {
     searchRepositories,
     toggleSortByStars,
     loadMoreRepositories,
-    refreshRepositories
   } = useGithub();
 
   const handleSearch = (searchUsername: string) => {
@@ -44,7 +43,6 @@ const HomePage: React.FC = () => {
         hasMore={hasMore}
         toggleSortByStars={toggleSortByStars}
         loadMoreRepositories={loadMoreRepositories}
-        refreshRepositories={refreshRepositories}
       />
     </AppContainer>
   );
