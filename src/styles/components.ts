@@ -143,12 +143,17 @@ export const RepositoryGrid = styled.div`
   animation: ${fadeIn} 0.3s ease-in;
 `;
 
+// Updated Repository Card and Description styles to ensure consistent heights
+
 export const RepositoryCard = styled.div`
   padding: 1.5rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 6px;
   background-color: ${({ theme }) => theme.colors.cardBackground};
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* This ensures all cards in the grid row have the same height */
   
   &:hover {
     transform: translateY(-3px);
@@ -170,14 +175,17 @@ export const RepoDescription = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 2; /* Limit to exactly 2 lines */
   -webkit-box-orient: vertical;
+  height: 2.6rem; /* Fixed height based on line-height and number of lines */
+  line-height: 1.3; /* Consistent line height */
 `;
 
 export const RepoStats = styled.div`
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
+  margin-top: auto; /* This pushes the stats to the bottom of the card */
 `;
 
 export const StatItem = styled.div`
