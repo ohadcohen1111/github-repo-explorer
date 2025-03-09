@@ -6,12 +6,14 @@ import { ThemeProvider } from './context/ThemeContext';
 import GlobalStyles from './styles/GlobalStyles';
 import HomePage from './pages/HomePage';
 import RepositoryDetailPage from './pages/RepositoryDetailPage';
+import ThemeToggle from './components/ThemeToggle';
 
 const App: React.FC = () => {
   return (
     <ThemeProvider>
       <GlobalStyles />
       <BrowserRouter>
+      <ThemeToggle />
         <GithubProvider>
           <Routes>
             <Route path="/" element={<HomePage />} />

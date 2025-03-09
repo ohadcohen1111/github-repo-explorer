@@ -96,7 +96,6 @@ export const fetchUserRepositories = async (
   }
   
   const cacheKey = `repos-${username}-page-${page}`;
-  const metaKey = `repos-${username}-meta`;
   
   // Check cache first
   if (cacheUtils.hasCache(cacheKey)) {
@@ -117,15 +116,6 @@ export const fetchUserRepositories = async (
     
     // Store repositories in localStorage
     cacheUtils.setCache(cacheKey, response.data);
-    
-    // Update metadata about whether there are more pages
-    // GitHub sends link headers for pagination
-    const linkHeader = response.headers.link || '';
-    const hasNextPage = linkHeader.includes('rel="next"');
-    
-    cacheUtils.setCache(metaKey, { 
-      hasMore: hasNextPage || response.data.length === PER_PAGE
-    });
     
     return response.data;
   } catch (error) {

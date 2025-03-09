@@ -1,7 +1,6 @@
 // src/pages/RepositoryDetailPage.tsx
 import React from 'react';
 import RepositoryDetail from '../components/RepositoryDetail';
-import ThemeToggle from '../components/ThemeToggle';
 import { 
   AppContainer, 
   Header, 
@@ -15,7 +14,6 @@ const RepositoryDetailPage: React.FC = () => {
       <Header>
         <HeaderContent>
           <PageTitle>Repository Details</PageTitle>
-          <ThemeToggle />
         </HeaderContent>
       </Header>
       

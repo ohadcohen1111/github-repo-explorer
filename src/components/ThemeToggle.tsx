@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const ToggleButton = styled.button`
   display: flex;
+  margin: 0.5rem;
   align-items: center;
   justify-content: center;
   background: none;

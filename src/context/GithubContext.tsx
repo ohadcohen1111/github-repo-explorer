@@ -1,9 +1,7 @@
-// src/context/GithubContext.tsx
 import React, { createContext, useContext, useState, ReactNode, useRef } from 'react';
 import { Repository } from '../types/github';
 import { 
   fetchUserRepositories,
-  isLastPage,
   clearUserCache
 } from '../services/githubApi';
 
@@ -63,7 +61,9 @@ export const GithubProvider: React.FC<GithubProviderProps> = ({ children }) => {
       const data = await fetchUserRepositories(user, 1);
       setRepositories(data);
       setUsername(user);
-      setHasMore(!isLastPage(user));
+      
+      // If first page is empty or has less items than expected, there are no more pages
+      setHasMore(data.length > 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
@@ -84,10 +84,13 @@ export const GithubProvider: React.FC<GithubProviderProps> = ({ children }) => {
       if (data.length > 0) {
         setRepositories(prev => [...prev, ...data]);
         currentPageRef.current = nextPage;
+        
+        // Check if more pages exist based on results
+        setHasMore(data.length > 0);
+      } else {
+        // If we got no results, there are no more pages
+        setHasMore(false);
       }
-      
-      // Check if we have more pages
-      setHasMore(!isLastPage(username));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
@@ -113,7 +116,9 @@ export const GithubProvider: React.FC<GithubProviderProps> = ({ children }) => {
       // Fetch first page again
       const data = await fetchUserRepositories(username, 1);
       setRepositories(data);
-      setHasMore(!isLastPage(username));
+      
+      // If first page is empty, there are no more pages
+      setHasMore(data.length > 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {

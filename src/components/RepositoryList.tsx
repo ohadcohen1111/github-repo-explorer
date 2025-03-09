@@ -87,7 +87,7 @@ const RepositoryList: React.FC<RepositoryListProps> = ({
             >
               <RepositoryCard>
                 <RepoName>{repo.name}</RepoName>
-                <RepoDescription>
+                <RepoDescription title={repo.description || "No description available"}> 
                   {repo.description || 'No description available'}
                 </RepoDescription>
                 <RepoStats>
