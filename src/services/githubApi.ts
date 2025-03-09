@@ -12,38 +12,54 @@ const githubClient = axios.create({
 // Pagination settings
 const PER_PAGE = 10;
 
+// Cache TTL in milliseconds (5 minutes)
+const CACHE_TTL = 5 * 60 * 1000;
+
+/**
+ * Cache item interface with timestamp for TTL implementation
+ */
+interface CacheItem<T> {
+  data: T;
+  timestamp: number;
+}
+
 /**
  * LocalStorage cache utility functions
  */
 const cacheUtils = {
-  // Set item in localStorage
+  // Set item in localStorage with timestamp
   setCache: <T>(key: string, data: T): void => {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      const cacheItem: CacheItem<T> = {
+        data,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(key, JSON.stringify(cacheItem));
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
   },
 
-  // Get item from localStorage
+  // Get item from localStorage with TTL check
   getCache: <T>(key: string): T | null => {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      if (!item) return null;
+      
+      const cacheItem = JSON.parse(item) as CacheItem<T>;
+      
+      // Check if cache is expired
+      if (Date.now() - cacheItem.timestamp > CACHE_TTL) {
+        // Cache expired, remove it
+        localStorage.removeItem(key);
+        return null;
+      }
+      
+      return cacheItem.data;
     } catch (error) {
       console.error('Error retrieving from localStorage:', error);
       return null;
     }
-  },
-
-  // Check if key exists in localStorage
-  hasCache: (key: string): boolean => {
-    return localStorage.getItem(key) !== null;
-  },
-
-  // Remove item from localStorage
-  removeCache: (key: string): void => {
-    localStorage.removeItem(key);
   },
 };
 
@@ -74,11 +90,10 @@ export const fetchUserRepositories = async (
   const cacheKey = `repos-${username}-page-${page}`;
   
   // Check cache first
-  if (cacheUtils.hasCache(cacheKey)) {
-    const cachedData = cacheUtils.getCache<Repository[]>(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+  const cachedData = cacheUtils.getCache<Repository[]>(cacheKey);
+  if (cachedData) {
+    console.log(`Using cached repositories data (page ${page}), valid for 5 minutes`);
+    return cachedData;
   }
   
   try {
@@ -89,7 +104,7 @@ export const fetchUserRepositories = async (
       }
     });
     
-    // Store repositories in localStorage
+    // Store repositories in localStorage with timestamp
     cacheUtils.setCache(cacheKey, response.data);
     
     return response.data;
@@ -109,18 +124,16 @@ export const fetchRepositoryDetails = async (username: string, repo: string): Pr
   const cacheKey = `repo-details-${username}-${repo}`;
   
   // Check cache first
-  if (cacheUtils.hasCache(cacheKey)) {
-    console.log('Using cached repository details from localStorage');
-    const cachedData = cacheUtils.getCache<Repository>(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+  const cachedData = cacheUtils.getCache<Repository>(cacheKey);
+  if (cachedData) {
+    console.log('Using cached repository details, valid for 5 minutes');
+    return cachedData;
   }
   
   try {
     const response = await githubClient.get<Repository>(`/repos/${username}/${repo}`);
     
-    // Store in localStorage
+    // Store in localStorage with timestamp
     cacheUtils.setCache(cacheKey, response.data);
     
     return response.data;
@@ -140,18 +153,16 @@ export const fetchRepositoryContributors = async (username: string, repo: string
   const cacheKey = `contributors-${username}-${repo}`;
   
   // Check cache first
-  if (cacheUtils.hasCache(cacheKey)) {
-    console.log('Using cached contributors data from localStorage');
-    const cachedData = cacheUtils.getCache<Contributor[]>(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+  const cachedData = cacheUtils.getCache<Contributor[]>(cacheKey);
+  if (cachedData) {
+    console.log('Using cached contributors data, valid for 5 minutes');
+    return cachedData;
   }
   
   try {
     const response = await githubClient.get<Contributor[]>(`/repos/${username}/${repo}/contributors`);
     
-    // Store in localStorage
+    // Store in localStorage with timestamp
     cacheUtils.setCache(cacheKey, response.data);
     
     return response.data;
