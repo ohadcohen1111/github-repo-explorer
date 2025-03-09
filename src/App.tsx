@@ -12,8 +12,8 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <GlobalStyles />
-      <BrowserRouter>
       <ThemeToggle />
+      <BrowserRouter>
         <GithubProvider>
           <Routes>
             <Route path="/" element={<HomePage />} />
