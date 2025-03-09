@@ -1,4 +1,3 @@
-// src/styles/components.ts
 import styled, { keyframes } from 'styled-components';
 
 // Animations

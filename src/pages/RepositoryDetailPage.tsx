@@ -1,4 +1,3 @@
-// src/pages/RepositoryDetailPage.tsx
 import React from 'react';
 import RepositoryDetail from '../components/RepositoryDetail';
 import { 

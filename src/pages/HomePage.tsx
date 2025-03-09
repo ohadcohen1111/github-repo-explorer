@@ -1,4 +1,3 @@
-// src/pages/HomePage.tsx
 import React from 'react';
 import Search from '../components/Search';
 import RepositoryList from '../components/RepositoryList';

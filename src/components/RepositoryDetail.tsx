@@ -1,4 +1,3 @@
-// src/components/RepositoryDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Repository, Contributor } from '../types/github';

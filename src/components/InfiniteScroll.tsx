@@ -1,4 +1,3 @@
-// src/components/InfiniteScroll.tsx
 import React, { useRef, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 

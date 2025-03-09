@@ -1,4 +1,3 @@
-// src/components/ThemeToggle.tsx
 import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '../context/ThemeContext';
